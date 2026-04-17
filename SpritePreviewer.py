@@ -3,7 +3,7 @@ import math
 from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
-
+# https://github.com/Shushimax/Sprite-Previewer
 def load_sprite(sprite_folder_name, number_of_frames):
     frames = []
     padding = math.ceil(math.log(number_of_frames - 1, 10))
