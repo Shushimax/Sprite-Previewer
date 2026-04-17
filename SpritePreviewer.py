@@ -4,8 +4,6 @@ from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
 
-# This function loads a series of sprite images stored in a folder with a
-# consistent naming pattern: sprite_# or sprite_##. It returns a list of the images.
 def load_sprite(sprite_folder_name, number_of_frames):
     frames = []
     padding = math.ceil(math.log(number_of_frames - 1, 10))
@@ -15,45 +13,71 @@ def load_sprite(sprite_folder_name, number_of_frames):
 
     return frames
 
-class SpritePreview(QMainWindow):
-
+class Interface(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Sprite Animation Preview")
-        # This loads the provided sprite and would need to be changed for your own.
+
         self.num_frames = 21
-        self.frames = load_sprite('spriteImages',self.num_frames)
+        self.sprites = load_sprite('spriteImages',self.num_frames)
+        self.current_pic = 0
 
-        # Add any other instance variables needed to track information as the program
-        # runs here
+        self.image_label = QLabel()
+        self.image_label.setPixmap(self.sprites[self.current_pic])
 
-        # Make the GUI in the setupUI method
+        self.animation_slider = QSlider()
+        self.exit_button = QPushButton("Exit")
+        self.next_button = QPushButton("Next")
+
+        self.animation_slider.valueChanged.connect(self.frame_rate_change)
+        self.exit_button.clicked.connect(self.exit_program)
+        self.next_button.clicked.connect(self.next_image)
+
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.next_image)
+        self.framerate = 1
+        self.timer.start (1000//self.framerate)
+
         self.setupUI()
 
-
     def setupUI(self):
-        # An application needs a central widget - often a QFrame
+        # Central Widget
         frame = QFrame()
 
-        # Add a lot of code here to make layouts, more QFrame or QWidgets, and
-        # the other components of the program.
-        # Create needed connections between the UI components and slot methods
-        # you define in this class.
+        # Layouts
+        main_layout = QVBoxLayout()
+        central_layout = QHBoxLayout()
+        central_layout.addWidget(self.image_label, alignment=Qt.AlignmentFlag.AlignCenter)
+        central_layout.addWidget(self.animation_slider)
 
+
+        buttons_layout = QVBoxLayout()
+        buttons_layout.addWidget(self.next_button)
+        buttons_layout.addWidget(self.exit_button)
+
+        main_layout.addLayout(central_layout)
+        main_layout.addLayout(buttons_layout)
+
+
+        frame.setLayout(main_layout)
         self.setCentralWidget(frame)
 
+    def exit_program(self):
+        QApplication.quit()
 
-    # You will need methods in the class to act as slots to connect to signals
+    def next_image(self):
+        self.current_pic = (self.current_pic + 1) % self.num_frames
+        self.image_label.setPixmap(self.sprites[self.current_pic])
+
+    def frame_rate_change(self):
+        self.framerate = self.animation_slider.value()
 
 
 def main():
     app = QApplication([])
-    # Create our custom application
-    window = SpritePreview()
-    # And show it
+    window = Interface()
     window.show()
-    app.exec()
 
+    app.exec()
 
 if __name__ == "__main__":
     main()
