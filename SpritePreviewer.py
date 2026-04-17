@@ -25,6 +25,9 @@ class Interface(QMainWindow):
         self.image_label.setPixmap(self.sprites[self.current_pic])
 
         self.animation_slider = QSlider()
+        self.animation_slider.setRange(1,100)
+        self.animation_slider.setTickPosition(QSlider.TickPosition.TicksBothSides)
+
         self.exit_button = QPushButton("Exit")
         self.next_button = QPushButton("Next")
 
@@ -33,9 +36,10 @@ class Interface(QMainWindow):
         self.next_button.clicked.connect(self.next_image)
 
         self.timer = QTimer()
-        self.timer.timeout.connect(self.next_image)
         self.framerate = 1
-        self.timer.start (1000//self.framerate)
+        self.timer.start(1000 // self.framerate)
+        self.timer.timeout.connect(self.next_image)
+
 
         self.setupUI()
 
@@ -70,6 +74,9 @@ class Interface(QMainWindow):
 
     def frame_rate_change(self):
         self.framerate = self.animation_slider.value()
+        self.timer.start(1000 // self.framerate)
+        self.timer.timeout.connect(self.next_image)
+        print(self.animation_slider.value())
 
 
 def main():
