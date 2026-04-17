@@ -28,12 +28,11 @@ class Interface(QMainWindow):
         self.animation_slider.setRange(1,100)
         self.animation_slider.setTickPosition(QSlider.TickPosition.TicksBothSides)
 
-        self.exit_button = QPushButton("Exit")
-        self.next_button = QPushButton("Next")
+        self.next_button = QPushButton("Stop")
 
         self.animation_slider.valueChanged.connect(self.frame_rate_change)
-        self.exit_button.clicked.connect(self.exit_program)
-        self.next_button.clicked.connect(self.next_image)
+        self.next_button.clicked.connect(self.stopstart)
+        self.isplaying = True
 
         self.timer = QTimer()
         self.framerate = 1
@@ -56,7 +55,7 @@ class Interface(QMainWindow):
 
         buttons_layout = QVBoxLayout()
         buttons_layout.addWidget(self.next_button)
-        buttons_layout.addWidget(self.exit_button)
+
 
         main_layout.addLayout(central_layout)
         main_layout.addLayout(buttons_layout)
@@ -65,18 +64,29 @@ class Interface(QMainWindow):
         frame.setLayout(main_layout)
         self.setCentralWidget(frame)
 
-    def exit_program(self):
-        QApplication.quit()
+
 
     def next_image(self):
         self.current_pic = (self.current_pic + 1) % self.num_frames
         self.image_label.setPixmap(self.sprites[self.current_pic])
 
     def frame_rate_change(self):
-        self.framerate = self.animation_slider.value()
-        self.timer.start(1000 // self.framerate)
-        self.timer.timeout.connect(self.next_image)
-        print(self.animation_slider.value())
+        if self.isplaying:
+            self.framerate = self.animation_slider.value()
+            self.timer.start(1000 // self.framerate)
+            self.timer.timeout.connect(self.next_image)
+            print(self.animation_slider.value())
+
+    def stopstart(self):
+        if self.isplaying:
+            self.next_button.setText("Start")
+            self.isplaying = False
+            self.timer.stop()
+        else:
+            self.next_button.setText("Stop")
+            self.isplaying = True
+            self.timer.start(1000 // self.framerate)
+
 
 
 def main():
